@@ -1,0 +1,31 @@
+.table td,
+.table th {
+  vertical-align: middle;
+}
+
+@media print {
+  body * {
+    visibility: hidden;
+  }
+
+  .boleta-print,
+  .boleta-print * {
+    visibility: visible;
+  }
+
+  .boleta-print {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    box-shadow: none !important;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+
+  .navbar {
+    display: none !important;
+  }
+}

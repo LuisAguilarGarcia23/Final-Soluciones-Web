@@ -1,0 +1,557 @@
+<section class="home-hero text-center mx-auto" *ngIf="!authService.isAuthenticated()">
+  <!-- PORTADA PÚBLICA -->
+<section class="hero-section" *ngIf="!authService.isAuthenticated()">
+  <div class="hero-content">
+    <span class="hero-badge">Tienda de abarrotes</span>
+
+    <h1>Bodega Carrera</h1>
+
+    <p class="hero-description">
+      Encuentra productos de abarrotes, bebidas, artículos de limpieza y productos
+      básicos para tu hogar. Atención rápida, confiable y cercana.
+    </p>
+
+    <div class="hero-buttons">
+      <a routerLink="/login" class="btn btn-primary btn-lg">
+        Iniciar sesión
+      </a>
+
+      <a routerLink="/registro" class="btn btn-outline-primary btn-lg">
+        Registrarme
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- BENEFICIOS -->
+<section class="benefits-section" *ngIf="!authService.isAuthenticated()">
+  <div class="section-title">
+    <h2>¿Por qué comprar con nosotros?</h2>
+    <p>Una experiencia sencilla, rápida y segura para tus compras diarias.</p>
+  </div>
+
+  <div class="row g-4">
+    <div class="col-md-4">
+      <div class="benefit-card">
+        <div class="benefit-icon">🛒</div>
+        <h5>Productos básicos</h5>
+        <p>
+          Alimentos, bebidas y artículos necesarios para el hogar en un solo lugar.
+        </p>
+      </div>
+    </div>
+
+    <div class="col-md-4">
+      <div class="benefit-card">
+        <div class="benefit-icon">⚡</div>
+        <h5>Compra rápida</h5>
+        <p>
+          Agrega productos al carrito, selecciona el método de pago y recibe tu boleta.
+        </p>
+      </div>
+    </div>
+
+    <div class="col-md-4">
+      <div class="benefit-card">
+        <div class="benefit-icon">✅</div>
+        <h5>Stock actualizado</h5>
+        <p>
+          El sistema controla el inventario automáticamente después de cada venta.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CATEGORÍAS DESTACADAS -->
+<section class="categories-section" *ngIf="!authService.isAuthenticated()">
+  <div class="section-title">
+    <h2>Categorías disponibles</h2>
+    <p>Productos pensados para las necesidades de cada día.</p>
+  </div>
+
+  <div class="row g-4">
+    <div class="col-md-3 col-sm-6">
+      <div class="category-card">
+        <span>🥤</span>
+        <h6>Bebidas</h6>
+      </div>
+    </div>
+
+    <div class="col-md-3 col-sm-6">
+      <div class="category-card">
+        <span>🍪</span>
+        <h6>Snacks</h6>
+      </div>
+    </div>
+
+    <div class="col-md-3 col-sm-6">
+      <div class="category-card">
+        <span>🧼</span>
+        <h6>Limpieza</h6>
+      </div>
+    </div>
+
+    <div class="col-md-3 col-sm-6">
+      <div class="category-card">
+        <span>🥫</span>
+        <h6>Abarrotes</h6>
+      </div>
+    </div>
+  </div>
+</section>
+</section>
+
+<section *ngIf="authService.isAuthenticated() && esAdminOVendedor()">
+  <div class="home-hero text-center mx-auto">
+    <h1>Sistema de Inventario y Ventas</h1>
+
+    <p class="lead">
+      Administra inventario, categorías y ventas según tu rol.
+    </p>
+
+    <div class="d-flex justify-content-center gap-2 flex-wrap">
+      <a class="btn btn-success" routerLink="/dashboard">Ir al dashboard</a>
+      <a class="btn btn-outline-success" routerLink="/inventario">Ver inventario</a>
+    </div>
+  </div>
+</section>
+
+<section *ngIf="authService.isAuthenticated() && esComprador()">
+
+  <div class="mb-4" *ngIf="!compraPendiente() && !boleta()">
+    <h2>Productos disponibles</h2>
+    <p class="text-muted">
+      Puedes comprar directamente o agregar productos al carrito.
+    </p>
+  </div>
+
+  <div class="mb-4" *ngIf="compraPendiente() && !boleta()">
+    <h2>Confirmar compra</h2>
+    <p class="text-muted">
+      Revisa los productos seleccionados y elige tu método de pago.
+    </p>
+  </div>
+
+  <div class="mb-4" *ngIf="boleta()">
+    <h2>Boleta generada</h2>
+    <p class="text-muted">
+      Tu compra fue registrada correctamente.
+    </p>
+  </div>
+
+  <div class="alert alert-danger" *ngIf="error()">
+    {{ error() }}
+  </div>
+
+  <div class="alert alert-success" *ngIf="mensaje()">
+    {{ mensaje() }}
+  </div>
+
+  <!-- CARRITO DE COMPRAS -->
+  <div
+    class="card shadow-sm mb-4"
+    *ngIf="!compraPendiente() && !boleta() && carrito().length > 0"
+  >
+    <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+      <strong>Carrito de compras</strong>
+      <span class="badge bg-primary">
+        {{ carrito().length }} producto(s)
+      </span>
+    </div>
+
+    <div class="card-body">
+      <div class="table-responsive">
+        <table class="table table-bordered align-middle">
+          <thead class="table-light">
+            <tr>
+              <th>Producto</th>
+              <th>Categoría</th>
+              <th class="text-center">Cantidad</th>
+              <th class="text-end">Precio</th>
+              <th class="text-end">Subtotal</th>
+              <th class="text-center">Acción</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            <tr *ngFor="let item of carrito()">
+              <td>{{ item.nombre }}</td>
+              <td>{{ item.categoria }}</td>
+
+              <td class="text-center" style="width: 130px;">
+                <input
+                  type="number"
+                  class="form-control text-center"
+                  min="1"
+                  [max]="item.stockDisponible"
+                  [(ngModel)]="item.cantidad"
+                  (ngModelChange)="actualizarCantidadCarrito(item, $event)"
+                />
+              </td>
+
+              <td class="text-end">
+                {{ item.precioUnitario | currency:'PEN':'S/ ' }}
+              </td>
+
+              <td class="text-end">
+                {{ item.subtotal | currency:'PEN':'S/ ' }}
+              </td>
+
+              <td class="text-center">
+                <button
+                  class="btn btn-sm btn-outline-danger"
+                  type="button"
+                  (click)="quitarDelCarrito(item.idProducto)"
+                >
+                  Quitar
+                </button>
+              </td>
+            </tr>
+          </tbody>
+
+          <tfoot>
+            <tr>
+              <td colspan="4" class="text-end">
+                <strong>Total del carrito</strong>
+              </td>
+              <td class="text-end">
+                <strong>{{ totalCarrito() | currency:'PEN':'S/ ' }}</strong>
+              </td>
+              <td></td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+
+      <div class="d-flex justify-content-end gap-2">
+        <button
+          class="btn btn-outline-danger"
+          type="button"
+          (click)="vaciarCarrito()"
+        >
+          Vaciar carrito
+        </button>
+
+        <button
+          class="btn btn-primary"
+          type="button"
+          (click)="comprarCarrito()"
+        >
+          Comprar carrito
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECCIÓN DE CONFIRMAR PAGO -->
+  <div
+    id="seccionPago"
+    class="card shadow-sm mb-4"
+    *ngIf="compraPendiente() as compra"
+  >
+    <div class="card-header bg-primary text-white">
+      <strong>Confirmar pago</strong>
+    </div>
+
+    <div class="card-body">
+      <div class="row">
+        <div class="col-md-7">
+          <h5 class="mb-3">Resumen de compra</h5>
+
+          <div class="table-responsive">
+            <table class="table table-bordered align-middle">
+              <thead class="table-light">
+                <tr>
+                  <th>Producto</th>
+                  <th>Categoría</th>
+                  <th class="text-center">Cantidad</th>
+                  <th class="text-end">Precio</th>
+                  <th class="text-end">Subtotal</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                <tr *ngFor="let item of compra.items">
+                  <td>{{ item.nombre }}</td>
+                  <td>{{ item.categoria }}</td>
+                  <td class="text-center">{{ item.cantidad }}</td>
+                  <td class="text-end">
+                    {{ item.precioUnitario | currency:'PEN':'S/ ' }}
+                  </td>
+                  <td class="text-end">
+                    {{ item.subtotal | currency:'PEN':'S/ ' }}
+                  </td>
+                </tr>
+              </tbody>
+
+              <tfoot>
+                <tr>
+                  <td colspan="4" class="text-end">
+                    <strong>Total a pagar</strong>
+                  </td>
+                  <td class="text-end">
+                    <strong>{{ compra.total | currency:'PEN':'S/ ' }}</strong>
+                  </td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+        </div>
+
+        <div class="col-md-5">
+          <h5 class="mb-3">Método de pago</h5>
+
+          <div class="d-grid gap-2">
+            <button
+              type="button"
+              class="btn"
+              [class.btn-success]="metodoPago() === 'Yape'"
+              [class.btn-outline-success]="metodoPago() !== 'Yape'"
+              (click)="seleccionarMetodoPago('Yape')"
+            >
+              Yape
+            </button>
+
+            <button
+              type="button"
+              class="btn"
+              [class.btn-primary]="metodoPago() === 'Tarjeta'"
+              [class.btn-outline-primary]="metodoPago() !== 'Tarjeta'"
+              (click)="seleccionarMetodoPago('Tarjeta')"
+            >
+              Tarjeta
+            </button>
+
+            <button
+              type="button"
+              class="btn"
+              [class.btn-secondary]="metodoPago() === 'Efectivo'"
+              [class.btn-outline-secondary]="metodoPago() !== 'Efectivo'"
+              (click)="seleccionarMetodoPago('Efectivo')"
+            >
+              Efectivo
+            </button>
+          </div>
+
+          <div class="alert alert-light border mt-3" *ngIf="metodoPago()">
+            Método seleccionado:
+            <strong>{{ metodoPago() }}</strong>
+          </div>
+
+          <div class="d-flex gap-2 mt-3">
+            <button
+              type="button"
+              class="btn btn-outline-danger w-50"
+              (click)="cancelarPago()"
+            >
+              Cancelar
+            </button>
+
+            <button
+              type="button"
+              class="btn btn-dark w-50"
+              (click)="pagar()"
+            >
+              Pagar
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BOLETA DE COMPRA -->
+  <div
+    id="boletaCompra"
+    class="card shadow-sm mb-4 boleta-print"
+    *ngIf="boleta() as b"
+  >
+    <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+      <div>
+        <strong>Boleta de compra</strong>
+        <div class="small">N° {{ b.numero }}</div>
+      </div>
+
+      <span class="badge bg-success">
+        {{ b.estado }}
+      </span>
+    </div>
+
+    <div class="card-body">
+      <div class="row mb-3">
+        <div class="col-md-6">
+          <p class="mb-1">
+            <strong>Empresa:</strong> VentasApp
+          </p>
+
+          <p class="mb-1">
+            <strong>Cliente:</strong> {{ b.cliente }}
+          </p>
+
+          <p class="mb-1">
+            <strong>Tipo de comprobante:</strong> Boleta
+          </p>
+
+          <p class="mb-1">
+            <strong>Método de pago:</strong> {{ b.metodoPago }}
+          </p>
+        </div>
+
+        <div class="col-md-6 text-md-end">
+          <p class="mb-1">
+            <strong>Fecha:</strong> {{ b.fecha }}
+          </p>
+
+          <p class="mb-1">
+            <strong>Día:</strong> {{ b.dia }}
+          </p>
+
+          <p class="mb-1">
+            <strong>Hora:</strong> {{ b.hora }}
+          </p>
+        </div>
+      </div>
+
+      <div class="table-responsive">
+        <table class="table table-bordered align-middle">
+          <thead class="table-light">
+            <tr>
+              <th>Producto</th>
+              <th>Categoría</th>
+              <th class="text-center">Cantidad</th>
+              <th class="text-end">Precio unitario</th>
+              <th class="text-end">Subtotal</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            <tr *ngFor="let item of b.items">
+              <td>{{ item.nombre }}</td>
+              <td>{{ item.categoria }}</td>
+              <td class="text-center">{{ item.cantidad }}</td>
+              <td class="text-end">
+                {{ item.precioUnitario | currency:'PEN':'S/ ' }}
+              </td>
+              <td class="text-end">
+                {{ item.subtotal | currency:'PEN':'S/ ' }}
+              </td>
+            </tr>
+          </tbody>
+
+          <tfoot>
+            <tr>
+              <td colspan="4" class="text-end">
+                <strong>Total pagado</strong>
+              </td>
+              <td class="text-end">
+                <strong>{{ b.total | currency:'PEN':'S/ ' }}</strong>
+              </td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+
+      <div class="alert alert-info mb-3">
+        Gracias por tu compra. La venta fue registrada correctamente y el stock fue actualizado.
+      </div>
+
+      <div class="d-flex gap-2 justify-content-end no-print">
+        <button
+          class="btn btn-outline-secondary"
+          type="button"
+          (click)="cerrarBoleta()"
+        >
+          Cerrar boleta
+        </button>
+
+        <button
+          class="btn btn-primary"
+          type="button"
+          (click)="imprimirBoleta()"
+        >
+          Imprimir boleta
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- CARGANDO PRODUCTOS -->
+  <div
+    class="alert alert-info"
+    *ngIf="loading() && !compraPendiente() && !boleta()"
+  >
+    Cargando productos disponibles...
+  </div>
+
+  <!-- SIN PRODUCTOS -->
+  <div
+    class="alert alert-warning"
+    *ngIf="!loading() && !compraPendiente() && !boleta() && productos().length === 0"
+  >
+    No hay productos con stock disponible.
+  </div>
+
+  <!-- LISTA DE PRODUCTOS DISPONIBLES -->
+  <div
+    class="row g-3"
+    *ngIf="!compraPendiente() && !boleta() && productos().length > 0"
+  >
+    <div class="col-md-4" *ngFor="let producto of productos()">
+      <div class="card h-100 shadow-sm">
+        <div class="card-body d-flex flex-column">
+
+          <h5 class="card-title">
+            {{ producto.producto }}
+          </h5>
+
+          <p class="card-text text-muted">
+            {{ producto.descripcion }}
+          </p>
+
+          <p class="mb-1">
+            <strong>Categoría:</strong> {{ nombreCategoria(producto) }}
+          </p>
+
+          <p class="mb-1">
+            <strong>Stock disponible:</strong> {{ producto.stock }}
+          </p>
+
+          <p class="mb-3">
+            <strong>Precio:</strong>
+            {{ producto.precio | currency:'PEN':'S/ ' }}
+          </p>
+
+          <div class="mb-3 mt-auto">
+            <label class="form-label">Cantidad</label>
+            <input
+              type="number"
+              class="form-control"
+              min="1"
+              [max]="producto.stock"
+              [(ngModel)]="cantidades[producto.id!]"
+            />
+          </div>
+
+          <button
+            class="btn btn-primary w-100 mb-2"
+            type="button"
+            (click)="comprar(producto)"
+          >
+            Comprar
+          </button>
+
+          <button
+            class="btn btn-outline-primary w-100"
+            type="button"
+            (click)="agregarAlCarrito(producto)"
+          >
+            Agregar al carrito
+          </button>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+</section>

@@ -1,0 +1,120 @@
+<div class="mb-4">
+  <h2>Dashboard</h2>
+  <p class="text-muted">
+    Resumen de ventas realizadas durante el día.
+  </p>
+</div>
+
+<div class="alert alert-info" *ngIf="loading()">
+  Cargando ventas del día...
+</div>
+
+<div class="alert alert-danger" *ngIf="error()">
+  {{ error() }}
+</div>
+
+<div class="row g-3 mb-4">
+  <div class="col-md-4">
+    <div class="card shadow-sm border-0">
+      <div class="card-body">
+        <h6 class="text-muted">Ventas registradas hoy</h6>
+        <h3 class="mb-0">{{ ventasHoy().length }}</h3>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-4">
+    <div class="card shadow-sm border-0">
+      <div class="card-body">
+        <h6 class="text-muted">Productos vendidos hoy</h6>
+        <h3 class="mb-0">{{ cantidadProductosVendidos() }}</h3>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-4">
+    <div class="card shadow-sm border-0">
+      <div class="card-body">
+        <h6 class="text-muted">Total vendido hoy</h6>
+        <h3 class="mb-0">
+          {{ totalVentasDia() | currency:'PEN':'S/ ' }}
+        </h3>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="card shadow-sm">
+  <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+    <strong>Ventas del día</strong>
+    <span>{{ fechaActualBackend() }}</span>
+  </div>
+
+  <div class="card-body">
+
+    <div class="alert alert-warning" *ngIf="!loading() && ventasHoy().length === 0">
+      No hay ventas registradas hoy.
+    </div>
+
+    <div class="table-responsive" *ngIf="ventasHoy().length > 0">
+      <table class="table table-bordered align-middle">
+        <thead class="table-light">
+          <tr>
+            <th>ID Venta</th>
+            <th>Fecha</th>
+            <th>Cliente</th>
+            <th>Producto</th>
+            <th class="text-center">Cantidad</th>
+            <th class="text-end">Precio unitario</th>
+            <th class="text-end">Total</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr *ngFor="let venta of ventasHoy()">
+            <td>
+              V-{{ venta.id }}
+            </td>
+
+            <td>
+              {{ venta.fecha | date:'dd/MM/yyyy' }}
+            </td>
+
+            <td>
+              {{ nombreCliente(venta) }}
+            </td>
+
+            <td>
+              {{ nombreProducto(venta) }}
+            </td>
+
+            <td class="text-center">
+              {{ venta.cantidad }}
+            </td>
+
+            <td class="text-end">
+              {{ precioUnitario(venta) | currency:'PEN':'S/ ' }}
+            </td>
+
+            <td class="text-end">
+              <strong>{{ venta.total | currency:'PEN':'S/ ' }}</strong>
+            </td>
+          </tr>
+        </tbody>
+
+        <tfoot>
+          <tr>
+            <td colspan="6" class="text-end">
+              <strong>Total vendido hoy</strong>
+            </td>
+
+            <td class="text-end">
+              <strong>{{ totalVentasDia() | currency:'PEN':'S/ ' }}</strong>
+            </td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+
+  </div>
+</div>

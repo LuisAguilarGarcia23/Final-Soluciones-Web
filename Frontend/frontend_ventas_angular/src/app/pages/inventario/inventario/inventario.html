@@ -1,0 +1,127 @@
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <div>
+    <h2>Inventario</h2>
+    <p class="text-muted mb-0">Productos, stock, precio y categoría.</p>
+  </div>
+</div>
+
+@if (error()) {
+  <div class="alert alert-danger">{{ error() }}</div>
+}
+
+@if (success()) {
+  <div class="alert alert-success">{{ success() }}</div>
+}
+
+<div class="card mb-4 shadow-sm">
+  <div class="card-body">
+    <form class="row g-2" [formGroup]="searchForm" (ngSubmit)="buscar()">
+      <div class="col-md-8">
+        <input class="form-control" formControlName="producto" placeholder="Buscar producto por nombre">
+      </div>
+      <div class="col-md-4 d-flex gap-2">
+        <button class="btn btn-outline-primary" type="submit">Buscar</button>
+        <button class="btn btn-outline-secondary" type="button" (click)="limpiarBusqueda()">Limpiar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+@if (canWrite()) {
+  <div class="card mb-4 shadow-sm">
+    <div class="card-body">
+      <h5 class="card-title">{{ editId() ? 'Editar producto' : 'Nuevo producto' }}</h5>
+
+      <form class="row g-3" [formGroup]="form" (ngSubmit)="guardar()">
+        <div class="col-md-4">
+          <label class="form-label">Producto</label>
+          <input class="form-control" formControlName="producto">
+        </div>
+
+        <div class="col-md-4">
+          <label class="form-label">Descripción</label>
+          <input class="form-control" formControlName="descripcion">
+        </div>
+
+        <div class="col-md-2">
+          <label class="form-label">Stock</label>
+          <input class="form-control" type="number" formControlName="stock">
+        </div>
+
+        <div class="col-md-2">
+          <label class="form-label">Precio</label>
+          <input class="form-control" type="number" step="0.01" formControlName="precio">
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label">Categoría</label>
+          <select class="form-select" formControlName="idCategoria">
+            <option [value]="0">Seleccione una categoría</option>
+            @for (categoria of categorias(); track categoria.id) {
+              <option [value]="categoria.id">{{ categoria.nombre }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="col-md-6 d-flex align-items-end gap-2">
+          <button class="btn btn-primary" type="submit">Guardar</button>
+          @if (editId()) {
+            <button class="btn btn-outline-secondary" type="button" (click)="cancelarEdicion()">Cancelar</button>
+          }
+        </div>
+      </form>
+    </div>
+  </div>
+}
+
+<div class="card shadow-sm">
+  <div class="table-responsive">
+    <table class="table table-hover align-middle mb-0">
+      <thead class="table-light">
+        <tr>
+          <th>ID</th>
+          <th>Producto</th>
+          <th>Descripción</th>
+          <th>Categoría</th>
+          <th>Stock</th>
+          <th>Precio</th>
+          <th class="text-end">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (item of productos(); track item.id) {
+          <tr>
+            <td>{{ item.id }}</td>
+            <td>{{ item.producto }}</td>
+            <td>{{ item.descripcion }}</td>
+            <td>{{ item.categoria?.nombre ?? 'Sin categoría' }}</td>
+            <td>
+              <span class="badge" [class.text-bg-danger]="item.stock <= 0" [class.text-bg-success]="item.stock > 0">
+                {{ item.stock }}
+              </span>
+            </td>
+            <td>S/ {{ item.precio }}</td>
+            <td class="text-end">
+              @if (canWrite()) {
+                <button class="btn btn-sm btn-outline-primary me-2" (click)="editar(item)">Editar</button>
+              }
+              @if (canDelete()) {
+                <button class="btn btn-sm btn-outline-danger" (click)="eliminar(item.id)">Eliminar</button>
+              }
+            </td>
+          </tr>
+        } @empty {
+          <tr>
+            <td colspan="7" class="text-center text-muted py-4">No hay productos registrados.</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="d-flex justify-content-between align-items-center mt-3">
+  <button class="btn btn-outline-secondary" (click)="paginaAnterior()" [disabled]="page() === 0">Anterior</button>
+  <span>Página {{ page() + 1 }} de {{ totalPages() || 1 }}</span>
+  <button class="btn btn-outline-secondary" (click)="paginaSiguiente()" [disabled]="page() + 1 >= totalPages()">Siguiente</button>
+</div>

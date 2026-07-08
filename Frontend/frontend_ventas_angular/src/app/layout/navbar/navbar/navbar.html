@@ -1,0 +1,103 @@
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+  <div class="container-fluid">
+    <a
+  class="navbar-brand"
+  [routerLink]="canManage() ? '/dashboard' : '/home'"
+>
+  Market Carrera
+</a>
+
+    <button 
+      class="navbar-toggler" 
+      type="button" 
+      data-bs-toggle="collapse" 
+      data-bs-target="#navbarNav"
+    >
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav me-auto">
+
+        @if (!isLoggedIn() || rol() === 'USUARIO') {
+  <li class="nav-item">
+    <a class="nav-link" routerLink="/home" routerLinkActive="active">
+      Inicio
+    </a>
+  </li>
+}
+
+        @if (canManage()) {
+          <li class="nav-item">
+            <a class="nav-link" routerLink="/dashboard" routerLinkActive="active">
+              Dashboard
+            </a>
+          </li>
+
+          <li class="nav-item">
+            <a class="nav-link" routerLink="/inventario" routerLinkActive="active">
+              Inventario
+            </a>
+          </li>
+
+          <li class="nav-item">
+            <a class="nav-link" routerLink="/categorias" routerLinkActive="active">
+              Categorías
+            </a>
+          </li>
+
+          <li class="nav-item">
+            <a class="nav-link" routerLink="/ventas" routerLinkActive="active">
+              Ventas
+            </a>
+          </li>
+        }
+
+        @if (isAdmin()) {
+          <li class="nav-item">
+            <a class="nav-link" routerLink="/usuarios" routerLinkActive="active">
+              Usuarios
+            </a>
+          </li>
+        }
+
+      </ul>
+
+      <ul class="navbar-nav ms-auto">
+
+        @if (!isLoggedIn()) {
+          <li class="nav-item">
+            <a class="nav-link" routerLink="/registro" routerLinkActive="active">
+              Registro
+            </a>
+          </li>
+
+          <li class="nav-item">
+            <a class="nav-link" routerLink="/login" routerLinkActive="active">
+              Login
+            </a>
+          </li>
+        }
+
+        @if (isLoggedIn()) {
+          <li class="nav-item">
+            <span class="nav-link text-info">
+              {{ username() }} | {{ rol() }}
+            </span>
+          </li>
+
+          <li class="nav-item">
+            <button 
+              class="btn btn-sm btn-outline-light ms-lg-2" 
+              type="button" 
+              (click)="logout()"
+            >
+              Salir
+            </button>
+          </li>
+        }
+
+      </ul>
+    </div>
+  </div>
+</nav>

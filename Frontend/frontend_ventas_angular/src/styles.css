@@ -1,0 +1,13 @@
+body {
+  min-height: 100vh;
+  background: #f8fafc;
+}
+
+.table td,
+.table th {
+  vertical-align: middle;
+}
+
+a {
+  text-decoration: none;
+}
